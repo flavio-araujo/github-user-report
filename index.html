@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Cost Centers - Sankhya Tech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 2%;
+            background-color: #f6f8fa;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 90%;
+            width: 90%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 3%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3%;
+            border-bottom: 2px solid #e1e4e8;
+            padding-bottom: 2%;
+        }
+        
+        .header h1 {
+            color: #24292e;
+            margin: 0;
+            font-size: 2.2em;
+        }
+        
+        .header p {
+            color: #586069;
+            margin: 1% 0 0 0;
+            font-size: 1.1em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 4%;
+            color: #586069;
+            font-size: 1.1em;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0366d6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2%;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .summary {
+            background: #f1f8ff;
+            border: 1px solid #c8e1ff;
+            border-radius: 6px;
+            padding: 2%;
+            margin-bottom: 2%;
+        }
+        
+        .summary h3 {
+            margin: 0 0 1% 0;
+            color: #0366d6;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5%;
+            margin-top: 1%;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1.2%;
+            border-radius: 4px;
+            border-left: 4px solid #0366d6;
+        }
+        
+        .stat-item strong {
+            display: block;
+            font-size: 1.2em;
+            color: #24292e;
+        }
+        
+        .cost-centers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2%;
+            background: white;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+            color: #24292e;
+        }
+        
+        .cost-centers-table th {
+            background: #f6f8fa;
+            border: 1px solid #d1d5da;
+            padding: 1.2%;
+            text-align: left;
+            font-weight: 600;
+            color: #24292e;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+        }
+        
+        .cost-centers-table td {
+            border: 1px solid #d1d5da;
+            padding: 1.2%;
+            vertical-align: top;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+            color: #24292e;
+        }
+        
+        .cost-centers-table tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+        
+        .cost-center-name {
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 5px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 12px;
+        }
+        
+        .error {
+            background: #ffeef0;
+            border: 1px solid #fdaeb7;
+            color: #d73a49;
+            padding: 2%;
+            border-radius: 6px;
+            margin: 2% 0;
+        }
+        
+        .error h3 {
+            margin: 0 0 1% 0;
+        }
+        
+        .api-info {
+            background: #f6f8fa;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            padding: 1.5%;
+            margin-bottom: 2%;
+            font-family: 'Open Sans', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 12px;
+            color: #586069;
+        }
+        
+        .refresh-btn {
+            background: #0366d6;
+            color: white;
+            border: none;
+            padding: 1% 2%;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 1.5%;
+        }
+        
+        .refresh-btn:hover {
+            background: #0256cc;
+        }
+        
+        .list-users-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0;
+            display: inline-block;
+        }
+        
+        .list-users-btn:hover {
+            background: #218838;
+        }
+        
+        .list-users-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f6f8fa;
+            border-radius: 6px;
+        }
+        
+        .config-form {
+            background: #fff;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .config-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #24292e;
+        }
+        
+        .config-form input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Open Sans', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        .config-form input:focus {
+            outline: none;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: #586069;
+            margin-top: 4px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e4e8;
+            color: #586069;
+            font-size: 12px;
+        }
+        
+        .footer a {
+            color: #0366d6;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>GitHub Enterprise and Copilot Users</h1>
+        </div>
+        
+        <div class="config-form">
+            <div class="form-group">
+                <label for="enterpriseInput">Enterprise Name:</label>
+                <input type="text" id="enterpriseInput" placeholder="e.g., your-company-name" />
+                <div class="form-hint">Enter your GitHub Enterprise name (required)</div>
+            </div>
+            <div class="form-group">
+                <label for="tokenInput">GitHub Token:</label>
+                <input type="password" id="tokenInput" placeholder="ghp_..." />
+                <div class="form-hint">Personal Access Token with admin:enterprise scope (required)</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="listUsersBtn" class="list-users-btn" onclick="loadCostCenters()">
+                📋 List Users
+            </button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+        
+        <div id="content" style="display: none;">
+            <div id="summary" class="summary"></div>
+            <div id="tableContainer"></div>
+            <button class="refresh-btn" onclick="loadCostCenters()">🔄 Refresh Data</button>
+        </div>
+        
+        <div id="error" style="display: none;"></div>
+        
+        <div class="footer">
+            <p>
+                <strong>GitHub Enterprise and Copilot Users Report</strong> v1.0.0
+            </p>
+            <p>
+                Licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+                • Free to use, modify, and share • 
+                <a href="https://github.com/flavio-araujo/github-user-report/" target="_blank" rel="noopener">View Source</a>
+            </p>
+            <p style="margin-top: 10px;">
+                Made with ❤️ for the GitHub community
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const API_CONFIG = {
+            token: '', 
+            enterprise: ''
+        };
+        
+        // Update endpoint when enterprise changes
+        function updateEndpoint() {
+            if (API_CONFIG.enterprise) {
+                API_CONFIG.endpoint = `https://api.github.com/enterprises/${API_CONFIG.enterprise}/settings/billing/cost-centers`;
+            }
+        }
+        
+        // Load saved configuration from localStorage
+        function loadSavedConfig() {
+            const savedEnterprise = localStorage.getItem('github_enterprise');
+            const savedToken = localStorage.getItem('github_token');
+            
+            if (savedEnterprise) {
+                document.getElementById('enterpriseInput').value = savedEnterprise;
+                API_CONFIG.enterprise = savedEnterprise;
+                updateEndpoint();
+            }
+            
+            if (savedToken) {
+                document.getElementById('tokenInput').value = savedToken;
+                API_CONFIG.token = savedToken;
+            }
+        }
+        
+        // Save configuration to localStorage
+        function saveConfig() {
+            const enterprise = document.getElementById('enterpriseInput').value.trim();
+            const token = document.getElementById('tokenInput').value.trim();
+            
+            if (enterprise) {
+                localStorage.setItem('github_enterprise', enterprise);
+                API_CONFIG.enterprise = enterprise;
+                updateEndpoint();
+            }
+            
+            if (token) {
+                localStorage.setItem('github_token', token);
+                API_CONFIG.token = token;
+            }
+        }
+        
+        // Update config when inputs change
+        document.getElementById('enterpriseInput').addEventListener('change', saveConfig);
+        document.getElementById('tokenInput').addEventListener('change', saveConfig);
+
+        // Helper function to parse Link header for pagination
+        function parseLinkHeader(linkHeader) {
+            if (!linkHeader) return {};
+            
+            const links = {};
+            const parts = linkHeader.split(',');
+            
+            parts.forEach(part => {
+                const section = part.split(';');
+                if (section.length !== 2) return;
+                
+                const url = section[0].trim().slice(1, -1);
+                const rel = section[1].trim().split('=')[1].slice(1, -1);
+                links[rel] = url;
+            });
+            
+            return links;
+        }
+
+        // Fetch all Copilot seats with pagination support
+        async function fetchAllCopilotSeats(orgName) {
+            const allSeats = [];
+            let page = 1;
+            let hasNextPage = true;
+            
+            console.log(`Starting paginated search for Copilot seats for org: ${orgName}`);
+            
+            while (hasNextPage) {
+                try {
+                    const url = `https://api.github.com/orgs/${orgName}/copilot/billing/seats?per_page=100&page=${page}`;
+                    console.log(`Fetching page ${page}: ${url}`);
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/vnd.github+json',
+                            'Authorization': `Bearer ${API_CONFIG.token}`,
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            console.warn(`Organization ${orgName} not found or doesn't have Copilot enabled`);
+                            return allSeats;
+                        }
+                        const errorText = await response.text();
+                        console.warn(`Failed to fetch Copilot data for org ${orgName}: ${response.status} - ${errorText}`);
+                        return allSeats;
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.seats && data.seats.length > 0) {
+                        console.log(`Page ${page}: ${data.seats.length} seats found`);
+                        allSeats.push(...data.seats);
+                    } else {
+                        console.log(`Page ${page}: No seats found`);
+                    }
+                    
+                    // Check for next page using Link header
+                    const linkHeader = response.headers.get('Link');
+                    const links = parseLinkHeader(linkHeader);
+                    
+                    if (links.next) {
+                        page++;
+                        // Add delay to avoid rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    } else {
+                        hasNextPage = false;
+                    }
+                    
+                } catch (error) {
+                    console.error(`Error fetching page ${page} for org ${orgName}:`, error);
+                    hasNextPage = false;
+                }
+            }
+            
+            console.log(`Total seats found for ${orgName}: ${allSeats.length}`);
+            return allSeats;
+        }
+
+        // Fetch all organization members with pagination
+        async function fetchAllOrgMembers(orgName) {
+            const allMembers = [];
+            let page = 1;
+            let hasNextPage = true;
+            
+            console.log(`🔄 Starting paginated search for org members: ${orgName}`);
+            
+            while (hasNextPage) {
+                try {
+                    const url = `https://api.github.com/orgs/${orgName}/members?per_page=100&page=${page}`;
+                    console.log(`   📄 Fetching page ${page}...`);
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/vnd.github+json',
+                            'Authorization': `Bearer ${API_CONFIG.token}`,
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.warn(`   ⚠️  Failed to fetch org members ${orgName}: ${response.status} - ${errorText}`);
+                        return allMembers;
+                    }
+                    
+                    const members = await response.json();
+                    
+                    if (members.length > 0) {
+                        console.log(`   ✅ Page ${page}: ${members.length} members found`);
+                        allMembers.push(...members);
+                    } else {
+                        console.log(`   ℹ️  Page ${page}: No members found`);
+                    }
+                    
+                    // Check for next page using Link header
+                    const linkHeader = response.headers.get('Link');
+                    const links = parseLinkHeader(linkHeader);
+                    
+                    if (links.next) {
+                        page++;
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    } else {
+                        hasNextPage = false;
+                    }
+                    
+                } catch (error) {
+                    console.error(`   ❌ Error fetching page ${page} for org ${orgName}:`, error);
+                    hasNextPage = false;
+                }
+            }
+            
+            console.log(`   🎯 Total members found for ${orgName}: ${allMembers.length}`);
+            return allMembers;
+        }
+
+        async function loadCostCenters() {
+            // Save and validate configuration
+            saveConfig();
+            
+            if (!API_CONFIG.enterprise) {
+                showError('Please enter your GitHub Enterprise name');
+                return;
+            }
+            
+            if (!API_CONFIG.token) {
+                showError('Please enter your GitHub Personal Access Token');
+                return;
+            }
+            
+            const loadingEl = document.getElementById('loading');
+            const contentEl = document.getElementById('content');
+            const errorEl = document.getElementById('error');
+            const listUsersBtn = document.getElementById('listUsersBtn');
+            
+            // Reset UI
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            listUsersBtn.disabled = true;
+            listUsersBtn.textContent = '⏳ Loading...';
+            
+            try {
+                console.log('Making API request to:', API_CONFIG.endpoint);
+                
+                const response = await fetch(API_CONFIG.endpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/vnd.github+json',
+                        'Authorization': `Bearer ${API_CONFIG.token}`,
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                await displayCostCenters(data);
+                
+            } catch (error) {
+                console.error('Error loading cost centers:', error);
+                showError(error.message);
+            } finally {
+                loadingEl.style.display = 'none';
+                listUsersBtn.disabled = false;
+                listUsersBtn.textContent = '📋 List Users';
+            }
+        }
+        
+        async function displayCostCenters(data) {
+            const contentEl = document.getElementById('content');
+            const summaryEl = document.getElementById('summary');
+            const tableContainerEl = document.getElementById('tableContainer');
+            
+            const costCenters = data.costCenters || [];
+            
+            if (costCenters.length === 0) {
+                showError('No cost centers found in API response.');
+                return;
+            }
+            
+            // Show loading message
+            tableContainerEl.innerHTML = '<p>🔄 Loading GitHub Enterprise and Copilot data...</p>';
+            
+            // Maps to store user data
+            const copilotUsers = new Map(); // username -> copilot data
+            const enterpriseUsers = new Map(); // username -> enterprise data
+            const allUsers = new Set(); // all unique usernames
+            const userSources = new Map(); // username -> array of sources
+            const orgsProcessed = new Set();
+            
+            console.log('\n🔍 ===== DEBUG: STARTING USER ANALYSIS =====\n');
+            
+            // First, collect users from Cost Centers (may include inactive users)
+            console.log('📋 PHASE 1: Collecting users from Cost Centers...');
+            const costCenterUsers = new Set();
+            for (const cc of costCenters) {
+                if (cc.resources && cc.resources.length > 0) {
+                    for (const resource of cc.resources) {
+                        if (resource.type === 'User') {
+                            costCenterUsers.add(resource.name);
+                            if (!userSources.has(resource.name)) {
+                                userSources.set(resource.name, []);
+                            }
+                            userSources.get(resource.name).push(`Cost Center: ${cc.name}`);
+                            console.log(`   📌 User found in Cost Center "${cc.name}": ${resource.name}`);
+                        }
+                    }
+                }
+            }
+            console.log(`\n   ✅ Total users in Cost Centers: ${costCenterUsers.size}\n`);
+            
+            // Get all unique organizations from cost centers
+            console.log('🏢 PHASE 2: Fetching organizations and their active members...');
+            for (const cc of costCenters) {
+                if (cc.resources && cc.resources.length > 0) {
+                    const orgResources = cc.resources.filter(r => r.type === 'Org');
+                    for (const orgResource of orgResources) {
+                        if (!orgsProcessed.has(orgResource.name) && orgResource.name && orgResource.name.trim() !== '') {
+                            orgsProcessed.add(orgResource.name);
+                            
+                            try {
+                                // Fetch organization members (Enterprise users - ACTIVE ONLY)
+                                console.log(`\n👥 Fetching ACTIVE members from org: ${orgResource.name}`);
+                                const orgMembers = await fetchAllOrgMembers(orgResource.name);
+                                
+                                console.log(`   🎯 Active members found: ${orgMembers.length}`);
+                                orgMembers.forEach(member => {
+                                    if (member.login) {
+                                        const username = member.login;
+                                        allUsers.add(username);
+                                        enterpriseUsers.set(username, {
+                                            orgName: orgResource.name,
+                                            type: member.type,
+                                            siteAdmin: member.site_admin
+                                        });
+                                        if (!userSources.has(username)) {
+                                            userSources.set(username, []);
+                                        }
+                                        userSources.get(username).push(`Enterprise Member: ${orgResource.name}`);
+                                        console.log(`      ✓ ${username} (active in org)`);
+                                    }
+                                });
+                                
+                                // Fetch Copilot seats
+                                console.log(`\n📊 Fetching Copilot licenses for org: ${orgResource.name}`);
+                                const copilotSeats = await fetchAllCopilotSeats(orgResource.name);
+                                
+                                console.log(`   🎯 Copilot licenses found: ${copilotSeats.length}`);
+                                copilotSeats.forEach(seat => {
+                                    if (seat.assignee && seat.assignee.login) {
+                                        const username = seat.assignee.login;
+                                        allUsers.add(username);
+                                        copilotUsers.set(username, {
+                                            orgName: orgResource.name,
+                                            createdAt: seat.created_at,
+                                            updatedAt: seat.updated_at,
+                                            pendingCancellationDate: seat.pending_cancellation_date,
+                                            lastActivityAt: seat.last_activity_at,
+                                            lastActivityEditor: seat.last_activity_editor
+                                        });
+                                        if (!userSources.has(username)) {
+                                            userSources.set(username, []);
+                                        }
+                                        userSources.get(username).push(`Copilot License: ${orgResource.name}`);
+                                        console.log(`      ✓ ${username} (with Copilot)`);
+                                    }
+                                });
+                                
+                                // Add delay between organizations
+                                await new Promise(resolve => setTimeout(resolve, 300));
+                                
+                            } catch (error) {
+                                console.error(`❌ Error processing org ${orgResource.name}:`, error);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Identify users that are in Cost Centers but NOT in active members
+            console.log('\n\n⚠️  ===== INACTIVE USERS DETECTED =====');
+            const inactiveUsers = new Set();
+            for (const username of costCenterUsers) {
+                if (!enterpriseUsers.has(username) && !copilotUsers.has(username)) {
+                    inactiveUsers.add(username);
+                    console.log(`\n❌ INACTIVE USER: ${username}`);
+                    console.log(`   Sources: ${userSources.get(username).join(', ')}`);
+                    console.log(`   Status: Present in Cost Centers but NOT found in organizations`);
+                    console.log(`   Reason: Likely deleted user or removed from organization`);
+                }
+            }
+            
+            if (inactiveUsers.size > 0) {
+                console.log(`\n⚠️  Total inactive users found: ${inactiveUsers.size}`);
+                console.log(`   These users are listed in Cost Centers but don't have active GitHub Enterprise accounts.`);
+            } else {
+                console.log(`\n✅ No inactive users detected!`);
+            }
+            
+            console.log('\n\n📊 ===== OVERALL SUMMARY =====');
+            console.log(`   - Users in Cost Centers: ${costCenterUsers.size}`);
+            console.log(`   - Active users (Enterprise): ${enterpriseUsers.size}`);
+            console.log(`   - Users with Copilot: ${copilotUsers.size}`);
+            console.log(`   - Inactive users: ${inactiveUsers.size}`);
+            console.log(`   - Total unique users: ${allUsers.size}`);
+            
+            // Fetch user details for all unique users
+            console.log(`\n\n🔍 PHASE 3: Fetching individual details for ${allUsers.size} users...`);
+            const flattenedResources = [];
+            let processedCount = 0;
+            
+            for (const username of allUsers) {
+                try {
+                    processedCount++;
+                    if (processedCount % 10 === 0) {
+                        console.log(`   Processed ${processedCount}/${allUsers.size} users...`);
+                    }
+                    
+                    const userResponse = await fetch(`https://api.github.com/users/${username}`, {
+                        headers: {
+                            'Accept': 'application/vnd.github+json',
+                            'Authorization': `Bearer ${API_CONFIG.token}`,
+                            'X-GitHub-Api-Version': '2022-11-28'
+                        }
+                    });
+                    
+                    let userDetails = {
+                        name: 'Name not available',
+                        email: 'Email not public'
+                    };
+                    
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        userDetails = {
+                            name: userData.name || userData.login || 'Name not available',
+                            email: userData.email || 'Email not public'
+                        };
+                    } else if (userResponse.status === 404) {
+                        console.warn(`\n⚠️  API /users/${username} returned 404 - User no longer exists on GitHub`);
+                        userDetails = {
+                            name: `${username} (DELETED)`,
+                            email: 'User deleted from GitHub'
+                        };
+                    }
+                    
+                    // Get data from both sources
+                    const copilotData = copilotUsers.get(username);
+                    const enterpriseData = enterpriseUsers.get(username);
+                    
+                    // Find cost center for this user
+                    let costCenterName = 'Not assigned';
+                    let costCenterId = '';
+                    
+                    for (const cc of costCenters) {
+                        if (cc.resources && cc.resources.some(r => r.type === 'User' && r.name === username)) {
+                            costCenterName = cc.name;
+                            costCenterId = cc.id;
+                            break;
+                        }
+                    }
+                    
+                    // Log inconsistency if user has Copilot but not Enterprise
+                    if (copilotData && !enterpriseData) {
+                        console.warn(`\n⚠️  INCONSISTENCY: ${username} has Copilot but is NOT listed as organization member!`);
+                    }
+                    
+                    flattenedResources.push({
+                        resourceName: username,
+                        resourceType: 'User',
+                        userName: userDetails.name,
+                        userEmail: userDetails.email,
+                        orgName: copilotData?.orgName || enterpriseData?.orgName || '',
+                        costCenterName: costCenterName,
+                        costCenterId: costCenterId,
+                        // License status
+                        hasCopilot: !!copilotData,
+                        hasEnterprise: !!enterpriseData,
+                        isInactive: inactiveUsers.has(username),
+                        sources: userSources.get(username) || [],
+                        // Copilot data
+                        createdAt: copilotData?.createdAt || null,
+                        updatedAt: copilotData?.updatedAt || null,
+                        pendingCancellationDate: copilotData?.pendingCancellationDate || null,
+                        lastActivity: copilotData?.lastActivityAt || null,
+                        lastActivityEditor: copilotData?.lastActivityEditor || null
+                    });
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                } catch (error) {
+                    console.error(`❌ Error fetching details for ${username}:`, error);
+                }
+            }
+            
+            console.log('\n✅ PHASE 3 completed!\n');
+            
+            // Calculate statistics
+            const totalUsers = flattenedResources.length;
+            const copilotUsersCount = flattenedResources.filter(r => r.hasCopilot).length;
+            const enterpriseOnlyCount = flattenedResources.filter(r => r.hasEnterprise && !r.hasCopilot).length;
+            const bothLicensesCount = flattenedResources.filter(r => r.hasCopilot && r.hasEnterprise).length;
+            const inactiveCount = flattenedResources.filter(r => r.isInactive).length;
+            const totalOrgs = orgsProcessed.size;
+            
+            // Display summary
+            summaryEl.innerHTML = `
+                <h3>📈 Cost Centers Summary</h3>
+                <div class="stats">
+                    <div class="stat-item">
+                        <strong>${costCenters.length}</strong>
+                        Cost Centers
+                    </div>
+                    <div class="stat-item">
+                        <strong>${totalUsers}</strong>
+                        Total Users
+                    </div>
+                    <div class="stat-item">
+                        <strong>${bothLicensesCount}</strong>
+                        Enterprise + Copilot
+                    </div>
+                    <div class="stat-item">
+                        <strong>${enterpriseOnlyCount}</strong>
+                        Enterprise Only
+                    </div>
+                    <div class="stat-item" style="border-left-color: #d73a49;">
+                        <strong>${inactiveCount}</strong>
+                        Inactive/Deleted
+                    </div>
+                    <div class="stat-item">
+                        <strong>${totalOrgs}</strong>
+                        Organizations
+                    </div>
+                </div>
+            `;
+            
+            // Sort resources: inactive users at the end, then by name A-Z
+            flattenedResources.sort((a, b) => {
+                // Inactive users go to the end
+                if (a.isInactive !== b.isInactive) {
+                    return a.isInactive ? 1 : -1;
+                }
+                // Sort by user name alphabetically (A-Z)
+                return a.userName.localeCompare(b.userName, 'en-US', { sensitivity: 'base' });
+            });
+            
+            // Generate table with license status
+            let tableHtml = `
+                <table class="cost-centers-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 13%;">Name</th>
+                            <th style="width: 13%;">Email</th>
+                            <th style="width: 10%;">Username</th>
+                            <th style="width: 10%;">Cost Center</th>
+                            <th style="width: 6%;">Enterprise</th>
+                            <th style="width: 6%;">Copilot</th>
+                            <th style="width: 9%;">Created</th>
+                            <th style="width: 8%;">Cancellation</th>
+                            <th style="width: 9%;">Last Activity</th>
+                            <th style="width: 7%;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            flattenedResources.forEach(resource => {
+                const formatDate = (dateString) => {
+                    if (!dateString) return '-';
+                    try {
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('en-US');
+                    } catch (error) {
+                        return 'Invalid date';
+                    }
+                };
+                
+                const formatDateTime = (dateString) => {
+                    if (!dateString) return '-';
+                    try {
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('en-US') + ' ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    } catch (error) {
+                        return 'Invalid date';
+                    }
+                };
+                
+                const rowStyle = resource.isInactive ? 'background-color: #fff5f5;' : '';
+                const statusBadge = resource.isInactive 
+                    ? '<span style="background: #d73a49; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">INACTIVE</span>'
+                    : '<span style="background: #28a745; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">ACTIVE</span>';
+                
+                tableHtml += `
+                    <tr style="${rowStyle}" title="${resource.sources.join(' | ')}">
+                        <td>
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 12px; font-weight: 600; color: #24292e; word-break: break-word; overflow-wrap: break-word;">
+                                ${resource.userName}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 12px; color: #24292e; word-break: break-word; overflow-wrap: break-word;">
+                                ${resource.userEmail}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-family: 'Open Sans', 'SFMono-Regular', Consolas, monospace; font-size: 11px; color: #0366d6; word-break: break-all; overflow-wrap: break-word;">
+                                ${resource.resourceName}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="cost-center-name">${resource.costCenterName}</div>
+                        </td>
+                        <td style="text-align: center;">
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 12px; font-weight: 600; color: ${resource.hasEnterprise ? '#28a745' : '#d73a49'};">
+                                ${resource.hasEnterprise ? '✓' : '✗'}
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 12px; font-weight: 600; color: ${resource.hasCopilot ? '#28a745' : '#d73a49'};">
+                                ${resource.hasCopilot ? '✓' : '✗'}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 11px; color: #24292e;" title="${resource.createdAt || 'Not available'}">
+                                ${formatDateTime(resource.createdAt)}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 11px; color: ${resource.pendingCancellationDate ? '#d73a49' : '#24292e'};" title="${resource.pendingCancellationDate || 'No pending cancellation'}">
+                                ${formatDate(resource.pendingCancellationDate)}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-family: 'Open Sans', sans-serif; font-size: 11px; color: #24292e;" title="${resource.lastActivity || 'No activity recorded'}">
+                                ${formatDateTime(resource.lastActivity)}
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            ${statusBadge}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHtml += `
+                    </tbody>
+                </table>
+            `;
+            
+            tableContainerEl.innerHTML = tableHtml;
+            contentEl.style.display = 'block';
+            
+            console.log('\n🎉 ===== PROCESSING COMPLETE! =====\n');
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.innerHTML = `
+                <div class="error">
+                    <h3>❌ Error Loading Cost Centers</h3>
+                    <p><strong>Error:</strong> ${message}</p>
+                    <p><strong>Endpoint:</strong> ${API_CONFIG.endpoint}</p>
+                    
+                    <h4>🔧 Possible solutions:</h4>
+                    <ul>
+                        <li>Verify that the token has <code>admin:enterprise</code> permission</li>
+                        <li>Verify that you have access to enterprise <code>${API_CONFIG.enterprise}</code></li>
+                        <li>Verify that cost centers are configured in GitHub Enterprise</li>
+                        <li>Authorize SAML SSO if needed: <a href="https://github.com/settings/tokens" target="_blank">Configure Token</a></li>
+                    </ul>
+                    
+                    <h4>📋 Equivalent curl command:</h4>
+                    <div style="background: #24292e; color: #f6f8fa; padding: 10px; border-radius: 4px; font-family: 'Open Sans', monospace; font-size: 12px; margin: 10px 0; overflow-x: auto;">
+curl -L \\<br>
+&nbsp;&nbsp;-H "Accept: application/vnd.github+json" \\<br>
+&nbsp;&nbsp;-H "Authorization: Bearer ${API_CONFIG.token}" \\<br>
+&nbsp;&nbsp;-H "X-GitHub-Api-Version: 2022-11-28" \\<br>
+&nbsp;&nbsp;${API_CONFIG.endpoint}
+                    </div>
+                    
+                    <button class="refresh-btn" onclick="loadCostCenters()">🔄 Try Again</button>
+                </div>
+            `;
+            errorEl.style.display = 'block';
+        }
+        
+        // Load saved configuration when page loads
+        document.addEventListener('DOMContentLoaded', loadSavedConfig);
+    </script>
+</body>
+</html>
