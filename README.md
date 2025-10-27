@@ -465,8 +465,41 @@ For issues with:
 ## Version
 
 Current version: 1.0.0
-Last updated: 2024
+Last updated: 2025
 
 ## License
 
-This is a utility tool. Use at your own discretion.
+This project is licensed under the **Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)**.
+
+### What this means:
+
+✅ **You CAN:**
+- Use this tool for personal or commercial purposes
+- Modify and adapt the code
+- Redistribute the tool
+- Use it in your organization
+
+📋 **You MUST:**
+- Give appropriate credit to the original author
+- Indicate if you made changes
+- Share your modifications under the same CC BY-SA 4.0 license
+- Include a link to the license
+
+### Attribution
+
+When using or sharing this tool, please include:
+
+```
+GitHub Enterprise and Copilot Users Report
+Licensed under CC BY-SA 4.0
+https://creativecommons.org/licenses/by-sa/4.0/
+```
+
+### Full License
+
+See [LICENSE.md](LICENSE.md) for the complete license text, or visit:
+https://creativecommons.org/licenses/by-sa/4.0/
+
+---
+
+**Made with ❤️ for the GitHub community**
